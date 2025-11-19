@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能外卖推荐 - DietCat</title>
+    <style>
+        .recommendation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .recommendation-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .food-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .food-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .food-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .food-shop {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .food-name {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .food-price {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .food-rating {
+            color: #f39c12;
+            margin: 5px 0;
+        }
+        .food-category {
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            color: #666;
+        }
+        .recommendation-stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    {% include 'web/header.html' %}
+    
+    <div class="recommendation-container">
+        <div class="recommendation-header">
+            <h1>🍱 智能外卖推荐</h1>
+            <p>基于您的偏好和健康数据精心挑选</p>
+        </div>
+
+        {% if error_message %}
+        <div style="background: #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 20px;">
+            {{ error_message }}
+        </div>
+        {% endif %}
+
+        <div class="recommendation-stats">
+            <p>📊 为您推荐了 <strong>{{ total_count }}</strong> 个菜品</p>
+            {% if user and user.eating_prefer %}
+            <p>🎯 根据您的偏好：<strong>{{ user.eating_prefer }}</strong></p>
+            {% endif %}
+        </div>
+
+        <button class="refresh-btn" onclick="refreshRecommendations()">
+            🔄 换一批推荐
+        </button>
+
+        <div class="food-grid">
+            {% for food in recommendations %}
+            <div class="food-card">
+                <div class="food-shop">{{ food.商铺名称 }}</div>
+                <div class="food-name">{{ food.菜品 }}</div>
+                
+                <div class="food-rating">
+                    ⭐ {{ food.average_rating|default:food.评分|default:4.0 }} 
+                    {% if food.rating_count %}
+                    <small>({{ food.rating_count }}评价)</small>
+                    {% endif %}
+                </div>
+                
+                <div class="food-price">¥{{ food.价格|default:"未知" }}</div>
+                
+                {% if food.分类 %}
+                <div class="food-category">{{ food.分类 }}</div>
+                {% endif %}
+                
+                {% if food.卡路里 %}
+                <div style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                    热量: {{ food.卡路里 }}卡
+                </div>
+                {% endif %}
+                
+                {% if food.蛋白质 %}
+                <div style="font-size: 0.9em; color: #666;">
+                    蛋白质: {{ food.蛋白质 }}g
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <h3>暂无推荐菜品</h3>
+                <p>请检查数据库连接或稍后重试</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function refreshRecommendations() {
+            // 显示加载状态
+            const btn = event.target;
+            btn.innerHTML = '🔄 推荐中...';
+            btn.disabled = true;
+            
+            // 重新加载页面
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+        
+        // 页面加载时显示推荐理由
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('推荐页面加载完成');
+        });
+    </script>
+</body>
+</html>

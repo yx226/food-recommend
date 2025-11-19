@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今日外卖推荐 - 智能美食搭配</title>
+    <style>
+        :root {
+            --primary-color: #ff6b6b;
+            --secondary-color: #4ecdc4;
+            --accent-color: #45b7d1;
+            --light-bg: #f8f9fa;
+            --border-color: #e9ecef;
+            --text-color: #2d3748;
+            --text-light: #718096;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 头部样式 */
+        .header-actions {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header-text h1 {
+            color: var(--primary-color);
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-text p {
+            color: var(--text-light);
+            font-size: 1.1em;
+        }
+        
+        .update-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .update-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 信息卡片样式 */
+        .info-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid;
+        }
+        
+        .date-info {
+            border-left-color: #ffd93d;
+            background: linear-gradient(135deg, #fff9c4, #fff3cd);
+            text-align: center;
+        }
+        
+        .diversity-note {
+            border-left-color: var(--secondary-color);
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            text-align: center;
+        }
+        
+        .health-tip {
+            border-left-color: var(--accent-color);
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        }
+        
+        /* 餐段样式 */
+        .meal-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .meal-section:hover {
+            transform: translateY(-3px);
+        }
+        
+        .meal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .meal-header h3 {
+            font-size: 1.5em;
+            color: var(--text-color);
+        }
+        
+        .time-suggestion {
+            color: var(--text-light);
+            font-size: 0.95em;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: var(--light-bg);
+            border-radius: 20px;
+            display: inline-block;
+        }
+        
+        .shop-header {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        .shop-header h3 {
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 食物项样式 */
+        .food-item {
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 15px 0;
+            background: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .food-item:hover {
+            border-color: var(--secondary-color);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.2);
+        }
+        
+        .food-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .food-content {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .food-image {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            flex-shrink: 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .food-details {
+            flex: 1;
+        }
+        
+        .food-details h4 {
+            font-size: 1.3em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .food-info {
+            color: var(--text-light);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .nutrition-info {
+            background: var(--light-bg);
+            padding: 12px;
+            border-radius: 10px;
+            margin: 12px 0;
+            font-size: 0.9em;
+            color: var(--text-color);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .nutrition-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .order-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+        }
+        
+        .order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 107, 0.4);
+        }
+        
+        /* 空状态样式 */
+        .empty-message {
+            text-align: center;
+            color: var(--text-light);
+            padding: 40px 20px;
+            font-style: italic;
+        }
+        
+        .empty-message p {
+            font-size: 1.1em;
+            opacity: 0.7;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header-actions {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-text h1 {
+                font-size: 1.8em;
+            }
+            
+            .food-content {
+                flex-direction: column;
+            }
+            
+            .food-image {
+                width: 100%;
+                height: 200px;
+            }
+            
+            .nutrition-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .meal-section {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .food-item {
+            animation: fadeInUp 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部操作区域 -->
+        <div class="header-actions">
+            <div class="header-text">
+                <h1>🍽️ 今日外卖推荐</h1>
+                <p>基于您的口味偏好，为您精心搭配今日外卖组合</p>
+            </div>
+            <button class="update-btn" onclick="window.location.href='/meals/update/'">
+                <span>🔄</span>
+                <span>换一批推荐</span>
+            </button>
+        </div>
+        
+        <!-- 日期信息 -->
+        {% if today_date %}
+        <div class="info-card date-info">
+            <p>📅 <strong>{{ today_date }} {{ weekday }}</strong></p>
+            <p class="sub-text">每顿饭来自不同餐厅，享受多样美食体验！</p>
+        </div>
+        {% endif %}
+        
+        <!-- 多样性提示 -->
+        <div class="info-card diversity-note">
+            <strong>🎯 今日特色：每顿饭来自不同餐厅！</strong><br>
+            早餐、午餐、晚餐、点心分别精选自不同商家，让您一天享受多种美食风味！
+        </div>
+        
+        <!-- 健康提示 -->
+        {% if health_tip %}
+        <div class="info-card health-tip">
+            <strong>{{ health_tip }}</strong>: {{ health_advice }}
+        </div>
+        {% endif %}
+        
+        <!-- 早餐推荐 -->
+        <div class="meal-section">
+            <div class="meal-header">
+                <span style="font-size: 1.8em;">🥐</span>
+                <h3>早餐推荐</h3>
+            </div>
+            <p class="time-suggestion">⏰ 建议用餐: 7:00-9:00</p>
+            
+            {% if breakfast_data and breakfast_data.shop and breakfast_data.shop != '无' %}
+            <div class="shop-header">
+                <h3>🏪 早餐商家: {{ breakfast_data.shop }}</h3>
+            </div>
+            {% endif %}
+            
+            {% if breakfast_data and breakfast_data.foods %}
+                {% for food in breakfast_data.foods %}
+                <div class="food-item">
+                    <div class="food-content">
+                        {% if food.图片 %}
+                        <img src="{{ food.图片 }}" alt="{{ food.菜品 }}" class="food-image" onerror="this.style.display='none'">
+                        {% endif %}
+                        <div class="food-details">
+                            <h4>{{ food.菜品 }}</h4>
+                            <p class="food-info">🏪 {{ food.商铺名称 }}</p>
+                            <p class="food-info">💰 ￥{{ food.价格 }} | 起送：￥{{ food.起送价|default:20 }} | 月售：{{ food.月销量|default:0 }}</p>
+                            <div class="nutrition-info">
+                                <span class="nutrition-item">🔥 {{ food.卡路里 }}卡</span>
+                                <span class="nutrition-item">🥩 {{ food.蛋白质 }}g蛋白</span>
+                                <span class="nutrition-item">🥑 {{ food.脂肪 }}g脂肪</span>
+                                <span class="nutrition-item">🍚 {{ food.碳水化合物 }}g碳水</span>
+                            </div>
+                            <p class="food-info">⭐ {{ food.评分 }}分 ({{ food.推荐人数 }}人推荐) | 🚴 {{ food.配送时间 }}分钟送达</p>
+                            <button class="order-btn" onclick="orderFood('{{ food.菜品 }}', '{{ food.商铺名称 }}')">📦 立即下单</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-message">
+                    <p>😴 暂无早餐推荐，稍后再来看看吧</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 午餐推荐 -->
+        <div class="meal-section">
+            <div class="meal-header">
+                <span style="font-size: 1.8em;">🍱</span>
+                <h3>午餐推荐</h3>
+            </div>
+            <p class="time-suggestion">⏰ 建议用餐: 11:30-13:30</p>
+            
+            {% if lunch_data and lunch_data.shop and lunch_data.shop != '无' %}
+            <div class="shop-header">
+                <h3>🏪 午餐商家: {{ lunch_data.shop }}</h3>
+            </div>
+            {% endif %}
+            
+            {% if lunch_data and lunch_data.foods %}
+                {% for food in lunch_data.foods %}
+                <div class="food-item">
+                    <div class="food-content">
+                        {% if food.图片 %}
+                        <img src="{{ food.图片 }}" alt="{{ food.菜品 }}" class="food-image" onerror="this.style.display='none'">
+                        {% endif %}
+                        <div class="food-details">
+                            <h4>{{ food.菜品 }}</h4>
+                            <p class="food-info">🏪 {{ food.商铺名称 }}</p>
+                            <p class="food-info">💰 ￥{{ food.价格 }} | 起送：￥{{ food.起送价|default:20 }} | 月售：{{ food.月销量|default:0 }}</p>
+                            <div class="nutrition-info">
+                                <span class="nutrition-item">🔥 {{ food.卡路里 }}卡</span>
+                                <span class="nutrition-item">🥩 {{ food.蛋白质 }}g蛋白</span>
+                                <span class="nutrition-item">🥑 {{ food.脂肪 }}g脂肪</span>
+                                <span class="nutrition-item">🍚 {{ food.碳水化合物 }}g碳水</span>
+                            </div>
+                            <p class="food-info">⭐ {{ food.评分 }}分 ({{ food.推荐人数 }}人推荐) | 🚴 {{ food.配送时间 }}分钟送达</p>
+                            <button class="order-btn" onclick="orderFood('{{ food.菜品 }}', '{{ food.商铺名称 }}')">📦 立即下单</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-message">
+                    <p>🍽️ 暂无午餐推荐，稍后再来看看吧</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 晚餐推荐 -->
+        <div class="meal-section">
+            <div class="meal-header">
+                <span style="font-size: 1.8em;">🍲</span>
+                <h3>晚餐推荐</h3>
+            </div>
+            <p class="time-suggestion">⏰ 建议用餐: 17:30-19:30</p>
+            
+            {% if dinner_data and dinner_data.shop and dinner_data.shop != '无' %}
+            <div class="shop-header">
+                <h3>🏪 晚餐商家: {{ dinner_data.shop }}</h3>
+            </div>
+            {% endif %}
+            
+            {% if dinner_data and dinner_data.foods %}
+                {% for food in dinner_data.foods %}
+                <div class="food-item">
+                    <div class="food-content">
+                        {% if food.图片 %}
+                        <img src="{{ food.图片 }}" alt="{{ food.菜品 }}" class="food-image" onerror="this.style.display='none'">
+                        {% endif %}
+                        <div class="food-details">
+                            <h4>{{ food.菜品 }}</h4>
+                            <p class="food-info">🏪 {{ food.商铺名称 }}</p>
+                            <p class="food-info">💰 ￥{{ food.价格 }} | 起送：￥{{ food.起送价|default:20 }} | 月售：{{ food.月销量|default:0 }}</p>
+                            <div class="nutrition-info">
+                                <span class="nutrition-item">🔥 {{ food.卡路里 }}卡</span>
+                                <span class="nutrition-item">🥩 {{ food.蛋白质 }}g蛋白</span>
+                                <span class="nutrition-item">🥑 {{ food.脂肪 }}g脂肪</span>
+                                <span class="nutrition-item">🍚 {{ food.碳水化合物 }}g碳水</span>
+                            </div>
+                            <p class="food-info">⭐ {{ food.评分 }}分 ({{ food.推荐人数 }}人推荐) | 🚴 {{ food.配送时间 }}分钟送达</p>
+                            <button class="order-btn" onclick="orderFood('{{ food.菜品 }}', '{{ food.商铺名称 }}')">📦 立即下单</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-message">
+                    <p>🌙 暂无晚餐推荐，稍后再来看看吧</p>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- 点心/饮品 -->
+        <div class="meal-section">
+            <div class="meal-header">
+                <span style="font-size: 1.8em;">🍰</span>
+                <h3>点心/饮品</h3>
+            </div>
+            <p class="time-suggestion">⏰ 随时享用</p>
+            
+            {% if snack_data and snack_data.shop and snack_data.shop != '无' %}
+            <div class="shop-header">
+                <h3>🏪 点心商家: {{ snack_data.shop }}</h3>
+            </div>
+            {% endif %}
+            
+            {% if snack_data and snack_data.foods %}
+                {% for food in snack_data.foods %}
+                <div class="food-item">
+                    <div class="food-content">
+                        {% if food.图片 %}
+                        <img src="{{ food.图片 }}" alt="{{ food.菜品 }}" class="food-image" onerror="this.style.display='none'">
+                        {% endif %}
+                        <div class="food-details">
+                            <h4>{{ food.菜品 }}</h4>
+                            <p class="food-info">🏪 {{ food.商铺名称 }}</p>
+                            <p class="food-info">💰 ￥{{ food.价格 }} | 起送：￥{{ food.起送价|default:20 }} | 月售：{{ food.月销量|default:0 }}</p>
+                            <div class="nutrition-info">
+                                <span class="nutrition-item">🔥 {{ food.卡路里 }}卡</span>
+                                <span class="nutrition-item">🥩 {{ food.蛋白质 }}g蛋白</span>
+                                <span class="nutrition-item">🥑 {{ food.脂肪 }}g脂肪</span>
+                                <span class="nutrition-item">🍚 {{ food.碳水化合物 }}g碳水</span>
+                            </div>
+                            <p class="food-info">⭐ {{ food.评分 }}分 ({{ food.推荐人数 }}人推荐)</p>
+                            <button class="order-btn" onclick="orderFood('{{ food.菜品 }}', '{{ food.商铺名称 }}')">📦 立即下单</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-message">
+                    <p>🍵 暂无点心推荐，稍后再来看看吧</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function orderFood(foodName, shopName) {
+            // 创建弹窗
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%;">
+                    <div style="font-size: 3em; margin-bottom: 15px;">🎉</div>
+                    <h3 style="margin-bottom: 10px; color: #2d3748;">下单成功！</h3>
+                    <p style="margin-bottom: 5px; color: #4a5568;"><strong>${foodName}</strong></p>
+                    <p style="margin-bottom: 20px; color: #718096;">来自: ${shopName}</p>
+                    <p style="margin-bottom: 20px; color: #4a5568; font-size: 0.9em;">您的订单正在处理中，请耐心等待商家接单！</p>
+                    <button onclick="this.closest('div').parentElement.remove()" 
+                            style="background: linear-gradient(135deg, #ff6b6b, #45b7d1); 
+                                   color: white; border: none; padding: 12px 30px; 
+                                   border-radius: 25px; cursor: pointer; font-weight: 600;">
+                        确认
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        // 添加滚动动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            // 观察所有餐段和食物项
+            document.querySelectorAll('.meal-section, .food-item').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能健康计划 - DietCat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --accent: #ff6b6b;
+            --success: #48bb78;
+            --warning: #ffa726;
+            --danger: #f56565;
+            --light: #f8fafc;
+            --dark: #2d3748;
+            --gray: #718096;
+            --gray-light: #e2e8f0;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            --accent-gradient: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --shadow-hover: 0 15px 40px rgba(0,0,0,0.12);
+            --radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 头部区域 */
+        .header {
+            text-align: center;
+            background: var(--gradient);
+            color: white;
+            padding: 50px 30px;
+            border-radius: var(--radius);
+            margin-bottom: 40px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 25px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .header-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.15);
+            padding: 15px 25px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.85;
+        }
+        
+        /* 按钮样式 */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .btn-primary:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--light);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        /* 主要内容区域 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+        
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .status-excellent {
+            background: rgba(72, 187, 120, 0.15);
+            color: var(--success);
+        }
+        
+        .status-good {
+            background: rgba(56, 178, 172, 0.15);
+            color: #38b2ac;
+        }
+        
+        .status-average {
+            background: rgba(255, 167, 38, 0.15);
+            color: var(--warning);
+        }
+        
+        .status-poor {
+            background: rgba(245, 101, 101, 0.15);
+            color: var(--danger);
+        }
+        
+        /* 进度条 */
+        .progress-section {
+            margin: 20px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: var(--gray-light);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.4) 50%, 
+                rgba(255,255,255,0) 100%);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* 健康提示 */
+        .health-tips {
+            background: linear-gradient(135deg, #fff9db, #fff3bf);
+            border: 1px solid #ffec99;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        
+        .health-tips h4 {
+            color: #e67700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tip-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            color: #5c3c00;
+        }
+        
+        .tip-item i {
+            color: #e67700;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+        
+        /* 侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .sidebar-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+        
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* 行动计划 */
+        .action-plan {
+            background: linear-gradient(135deg, #f0f4ff, #e6f7ff);
+            border-left: 5px solid var(--primary);
+        }
+        
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        
+        .action-item:last-child {
+            border-bottom: none;
+        }
+        
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .action-content h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+        
+        .action-content p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* 营养摄入 */
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .nutrition-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            background: var(--light);
+        }
+        
+        .nutrition-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .nutrition-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        /* 目标追踪 */
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .goal-progress {
+            width: 60px;
+            height: 60px;
+            position: relative;
+        }
+        
+        .goal-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(var(--primary) 0% 75%, var(--gray-light) 75% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .goal-circle::after {
+            content: "";
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+        }
+        
+        .goal-text {
+            flex: 1;
+        }
+        
+        .goal-text h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .goal-text p {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .header-stats {
+                gap: 15px;
+            }
+            
+            .stat-item {
+                padding: 12px 20px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-heartbeat"></i> DietCat 智能健康计划</h1>
+                <p>基于您的健康数据与生活习惯定制的个性化健康改善方案</p>
+                
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">85%</div>
+                        <div class="stat-label">计划完成度</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12</div>
+                        <div class="stat-label">持续周数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">4.2kg</div>
+                        <div class="stat-label">体重变化</div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <a href="/testdown/" class="btn btn-primary">
+                        <i class="fas fa-download"></i> 下载详细计划
+                    </a>
+                    <button class="btn btn-secondary" onclick="window.print()">
+                        <i class="fas fa-print"></i> 打印计划
+                    </button>
+                    <button class="btn btn-secondary" id="shareBtn">
+                        <i class="fas fa-share-alt"></i> 分享进度
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="main-content">
+                <!-- 睡眠与运动分析 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon">
+                                <i class="fas fa-bed"></i>
+                            </div>
+                            <h3>睡眠与运动分析</h3>
+                        </div>
+                        <span class="status-badge status-excellent">
+                            <i class="fas fa-check-circle"></i> 优秀
+                        </span>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>睡眠质量评分</span>
+                            <span>85%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 85%; background: var(--success);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>运动频率</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%; background: var(--primary);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>日常活动量</span>
+                            <span>68%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 68%; background: var(--warning);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="health-tips">
+                        <h4><i class="fas fa-lightbulb"></i> 改善建议</h4>
+                        <div class="tip-list">
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>保持规律作息，每晚7-8小时优质睡眠</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>每周至少150分钟中等强度运动</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>尝试冥想或深呼吸帮助入睡</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>下午4点后避免摄入咖啡因</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 饮食习惯评估 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon">
+                                <i class="fas fa-utensils"></i>
+                            </div>
+                            <h3>饮食习惯评估</h3>
+                        </div>
+                        <span class="status-badge status-average">
+                            <i class="fas fa-exclamation-circle"></i> 需要改善
+                        </span>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>饮食规律性</span>
+                            <span>60%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 60%; background: var(--warning);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>营养均衡度</span>
+                            <span>70%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 70%; background: var(--primary);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>水分摄入</span>
+                            <span>80%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%; background: var(--success);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="health-tips">
+                        <h4><i class="fas fa-lightbulb"></i> 饮食建议</h4>
+                        <div class="tip-list">
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>控制应酬频率，避免过量饮酒</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>增加蔬菜水果摄入，均衡营养</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>减少高油高盐食物，选择清淡饮食</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>定时定量进食，避免暴饮暴食</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 身体素质评估 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <div class="card-icon">
+                                <i class="fas fa-running"></i>
+                            </div>
+                            <h3>身体素质评估</h3>
+                        </div>
+                        <span class="status-badge status-good">
+                            <i class="fas fa-thumbs-up"></i> 良好
+                        </span>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>体能水平</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 75%; background: var(--primary);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>柔韧性</span>
+                            <span>65%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%; background: var(--warning);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>耐力</span>
+                            <span>80%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 80%; background: var(--success);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="health-tips">
+                        <h4><i class="fas fa-lightbulb"></i> 提升建议</h4>
+                        <div class="tip-list">
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>结合有氧和无氧运动，全面提升体能</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>每周进行2-3次力量训练</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>运动前后充分拉伸，提高柔韧性</span>
+                            </div>
+                            <div class="tip-item">
+                                <i class="fas fa-check"></i>
+                                <span>保持充足蛋白质摄入，支持肌肉恢复</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 侧边栏 -->
+            <div class="sidebar">
+                <!-- 行动计划 -->
+                <div class="sidebar-card action-plan">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-tasks"></i> 本周行动计划
+                    </h3>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-bed"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>睡眠目标</h4>
+                            <p>每晚11点前入睡，保证7小时睡眠</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>运动计划</h4>
+                            <p>每周3次有氧运动，2次力量训练</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-apple-alt"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>饮食控制</h4>
+                            <p>减少外出就餐至每周2次以内</p>
+                        </div>
+                    </div>
+                    
+                    <div class="action-item">
+                        <div class="action-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div class="action-content">
+                            <h4>水分摄入</h4>
+                            <p>每日饮用至少2升水</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 营养摄入 -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-chart-pie"></i> 今日营养摄入
+                    </h3>
+                    
+                    <div class="nutrition-grid">
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">1,850</div>
+                            <div class="nutrition-label">卡路里</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">125g</div>
+                            <div class="nutrition-label">蛋白质</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">210g</div>
+                            <div class="nutrition-label">碳水化合物</div>
+                        </div>
+                        <div class="nutrition-item">
+                            <div class="nutrition-value">55g</div>
+                            <div class="nutrition-label">脂肪</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 目标追踪 -->
+                <div class="sidebar-card">
+                    <h3 class="sidebar-title">
+                        <i class="fas fa-bullseye"></i> 目标追踪
+                    </h3>
+                    
+                    <div class="goal-item">
+                        <div class="goal-progress">
+                            <div class="goal-circle"></div>
+                        </div>
+                        <div class="goal-text">
+                            <h4>减重目标</h4>
+                            <p>已完成75%，剩余2kg</p>
+                        </div>
+                    </div>
+                    
+                    <div class="goal-item">
+                        <div class="goal-progress">
+                            <div class="goal-circle" style="background: conic-gradient(var(--success) 0% 60%, var(--gray-light) 60% 100%);"></div>
+                        </div>
+                        <div class="goal-text">
+                            <h4>体脂率</h4>
+                            <p>已完成60%，目标22%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 进度条动画
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 300);
+            });
+            
+            // 分享按钮功能
+            document.getElementById('shareBtn').addEventListener('click', function() {
+                alert('分享功能即将推出！您可以截图分享您的健康计划进度。');
+            });
+            
+            // 为卡片添加点击效果
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

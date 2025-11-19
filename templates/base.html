@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- 基础PWA配置 -->
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#1abc9c"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="饭点子">
+    <link rel="apple-touch-icon" href="/static/icons/icon-152x152.png">
+
+    <!-- 使用兼容的jQuery版本 -->
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+
+    <!-- Bootstrap4 CSS -->
+    <link href="{% static "/flatui/dist/css/vendor/bootstrap.min.css" %}" rel="stylesheet">
+    <link href="{% static "/flatui/dist/css/flat-ui.css" %}" rel="stylesheet">
+
+    <!-- 图标 -->
+    <link rel="shortcut icon" href="{% static "/flatui/dist/favicon.ico" %}">
+
+    <!-- Vue -->
+    <script src="{% static "/vue/js/vue.min.js" %}"></script>
+
+    <title>{% block title %}默认标题{% endblock %}-饭点子</title>
+
+    <!-- Echarts -->
+    <script type="text/javascript" src="{% static "/echarts/echarts.min.js" %}"></script>
+
+    <!-- 子类HTML自己要引入的依赖 -->
+    {% block own-rely %}
+    {% endblock %}
+</head>
+<body>
+{# 引入导航条 #}
+{% include 'nav.html' %}
+
+{# 默认内容区域 #}
+{% block content %}
+    <div>
+        这里是默认内容
+    </div>
+{% endblock %}
+
+{# 引入尾标 #}
+{% include 'bottom.html' %}
+
+<!-- 必要的JavaScript -->
+<script src="{% static "/flatui/other_rely/video.js" %}"></script>
+<script src="{% static "/flatui/dist/scripts/flat-ui.js" %}"></script>
+
+<!-- 简化的PWA安装引导 -->
+<script>
+// 立即显示安装引导按钮
+setTimeout(() => {
+    showInstallGuide();
+}, 3000);
+
+function showInstallGuide() {
+    if (!document.getElementById('install-guide-btn')) {
+        const guideBtn = document.createElement('button');
+        guideBtn.id = 'install-guide-btn';
+        guideBtn.innerHTML = '📱 安装到手机';
+        guideBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #1abc9c, #16a085);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.4);
+            z-index: 1000;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        `;
+        
+        guideBtn.addEventListener('click', showInstallInstructions);
+        document.body.appendChild(guideBtn);
+        console.log('✅ 安装引导按钮已显示');
+    }
+}
+
+function showInstallInstructions() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent);
+    const isSafari = /Safari/.test(navigator.userAgent);
+    
+    let instructions = '📱 如何安装"饭点子"到手机：\n\n';
+    
+    if (isIOS) {
+        instructions += '🍎 iPhone用户：\n';
+        instructions += '1. 点击底部分享按钮 (⬆️)\n';
+        instructions += '2. 向下滑动找到"添加到主屏幕"\n';
+        instructions += '3. 点击"添加"完成安装\n\n';
+        instructions += '💡 提示：使用Safari浏览器效果最佳';
+    } else if (isAndroid) {
+        instructions += '🤖 Android用户：\n';
+        if (isChrome) {
+            instructions += '1. 点击右上角菜单 (⋮)\n';
+            instructions += '2. 点击"添加到主屏幕"\n';
+            instructions += '3. 点击"添加"完成安装\n\n';
+            instructions += '💡 提示：使用Chrome浏览器效果最佳';
+        } else {
+            instructions += '1. 点击浏览器菜单按钮\n';
+            instructions += '2. 查找"添加到主屏幕"选项\n';
+            instructions += '3. 按照提示完成安装';
+        }
+    } else {
+        instructions += '💻 桌面用户：\n';
+        instructions += '1. 在地址栏查找下载图标 (⬇️)\n';
+        instructions += '2. 或等待浏览器弹出安装提示\n';
+        instructions += '3. 点击安装即可\n\n';
+        instructions += '📱 建议使用手机访问以获得最佳体验';
+    }
+    
+    instructions += '\n\n🔧 如果看不到选项：\n';
+    instructions += '• 刷新页面等待30秒\n';
+    instructions += '• 使用最新版Chrome或Safari\n';
+    instructions += '• 确保网络连接稳定';
+    
+    if (confirm(instructions + '\n\n点击"确定"查看详细步骤，点击"取消"关闭')) {
+        // 显示更详细的步骤
+        showDetailedSteps();
+    }
+}
+
+function showDetailedSteps() {
+    const detailedHTML = `
+        <div style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 10000;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        ">
+            <h3 style="color: #1abc9c; margin-top: 0;">📱 安装"饭点子"详细步骤</h3>
+            
+            <div style="margin: 20px 0;">
+                <h4>🍎 iPhone用户 (Safari浏览器)：</h4>
+                <ol>
+                    <li>点击底部 <strong>分享按钮</strong> (⬆️ 图标)</li>
+                    <li>向下滑动找到 <strong>"添加到主屏幕"</strong></li>
+                    <li>点击 <strong>"添加"</strong> 按钮</li>
+                    <li>桌面会出现"饭点子"图标</li>
+                </ol>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h4>🤖 Android用户 (Chrome浏览器)：</h4>
+                <ol>
+                    <li>点击右上角 <strong>菜单按钮</strong> (⋮ 三个点)</li>
+                    <li>选择 <strong>"添加到主屏幕"</strong></li>
+                    <li>点击 <strong>"添加"</strong> 按钮</li>
+                    <li>桌面会出现"饭点子"图标</li>
+                </ol>
+            </div>
+            
+            <div style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <h4>💡 安装后体验：</h4>
+                <ul>
+                    <li>📱 像原生APP一样全屏运行</li>
+                    <li>⚡ 快速启动，无需打开浏览器</li>
+                    <li>🔔 支持推送通知（如配置）</li>
+                    <li>💾 可离线使用部分功能</li>
+                </ul>
+            </div>
+            
+            <button onclick="this.parentElement.remove()" style="
+                background: #1abc9c;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+                margin-top: 15px;
+            ">关闭说明</button>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', detailedHTML);
+}
+
+// 简化的Service Worker尝试（不强制）
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('{% static "sw.js" %}')
+        .then(reg => console.log('Service Worker注册尝试'))
+        .catch(err => console.log('Service Worker注册跳过'));
+}
+
+console.log('🎯 饭点子PWA引导已加载');
+console.log('💡 提示：开发环境PWA功能可能受限，生产环境更稳定');
+</script>
+</body>
+</html>

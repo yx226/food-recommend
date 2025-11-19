@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>菜品数据管理</title>
+    <!-- 使用您现有的CSS样式 -->
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: black;
+        }
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            margin-bottom: -1px;
+        }
+        .tab.active {
+            border-color: #ddd #ddd #fff;
+            border-radius: 4px 4px 0 0;
+            background: white;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>菜品数据管理</h1>
+        
+        <!-- 消息显示 -->
+        {% if message %}
+            <div class="alert {% if success %}alert-success{% else %}alert-error{% endif %}">
+                {{ message }}
+            </div>
+        {% endif %}
+        
+        <!-- 标签页 -->
+        <div class="tabs">
+            <div class="tab active" onclick="openTab('update')">更新菜品</div>
+            <div class="tab" onclick="openTab('add')">添加菜品</div>
+            <div class="tab" onclick="openTab('batch')">批量操作</div>
+        </div>
+        
+        <!-- 更新菜品 -->
+        <div id="update" class="tab-content active">
+            <h2>更新现有菜品信息</h2>
+            <form method="post" action="{% url 'update_food' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="shop_name">商铺名称:</label>
+                    <input type="text" id="shop_name" name="shop_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="food_name">菜品名称:</label>
+                    <input type="text" id="food_name" name="food_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">分类:</label>
+                    <select id="category" name="category">
+                        <option value="">-- 选择分类 --</option>
+                        <option value="面食">面食</option>
+                        <option value="川菜">川菜</option>
+                        <option value="小吃">小吃</option>
+                        <option value="饮品">饮品</option>
+                        <option value="西式快餐">西式快餐</option>
+                        <option value="火锅">火锅</option>
+                        <option value="中餐">中餐</option>
+                        <option value="健康">健康</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="calories">卡路里:</label>
+                    <input type="number" id="calories" name="calories" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="protein">蛋白质(g):</label>
+                    <input type="number" id="protein" name="protein" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="carbs">碳水化合物(g):</label>
+                    <input type="number" id="carbs" name="carbs" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label for="fat">脂肪(g):</label>
+                    <input type="number" id="fat" name="fat" step="0.1">
+                </div>
+                <button type="submit" class="btn btn-primary">更新菜品</button>
+            </form>
+        </div>
+        
+        <!-- 添加菜品 -->
+        <div id="add" class="tab-content">
+            <h2>添加新菜品</h2>
+            <form method="post" action="{% url 'add_food' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="new_shop_name">商铺名称:</label>
+                    <input type="text" id="new_shop_name" name="shop_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_food_name">菜品名称:</label>
+                    <input type="text" id="new_food_name" name="food_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_category">分类:</label>
+                    <select id="new_category" name="category" required>
+                        <option value="面食">面食</option>
+                        <option value="川菜">川菜</option>
+                        <option value="小吃">小吃</option>
+                        <option value="饮品">饮品</option>
+                        <option value="西式快餐">西式快餐</option>
+                        <option value="火锅">火锅</option>
+                        <option value="中餐">中餐</option>
+                        <option value="健康">健康</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="new_calories">卡路里:</label>
+                    <input type="number" id="new_calories" name="calories" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_protein">蛋白质(g):</label>
+                    <input type="number" id="new_protein" name="protein" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_carbs">碳水化合物(g):</label>
+                    <input type="number" id="new_carbs" name="carbs" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="new_fat">脂肪(g):</label>
+                    <input type="number" id="new_fat" name="fat" step="0.1" required>
+                </div>
+                <button type="submit" class="btn btn-primary">添加菜品</button>
+            </form>
+        </div>
+        
+        <!-- 批量操作 -->
+        <div id="batch" class="tab-content">
+            <h2>批量操作</h2>
+            <div class="form-group">
+                <h3>批量更新分类</h3>
+                <p>根据菜品名称自动更新所有菜品的分类</p>
+                <form method="post" action="{% url 'batch_update_foods' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning" 
+                            onclick="return confirm('确定要批量更新所有菜品分类吗？')">
+                        开始批量更新分类
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openTab(tabName) {
+            // 隐藏所有标签内容
+            var tabContents = document.getElementsByClassName('tab-content');
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // 移除所有标签的active类
+            var tabs = document.getElementsByClassName('tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // 显示选中的标签内容并激活标签
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
