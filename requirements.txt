@@ -1,0 +1,6 @@
+Django==2.1
+Pillow==9.0.0
+requests==2.31.0
+gunicorn==20.1.0
+whitenoise==6.4.0
+python-dotenv==1.0.0
